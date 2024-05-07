@@ -1,0 +1,276 @@
+1)what is host
+it is the name of the server,when the server is running in our system then it is an local host
+
+2) is semi column is necessary in all querry;
+it is used to seperate 2 querrys when it is used at the end of one queey then that querry is treated as asingle querry
+
+3)what is RDBMS	
+database that stores and access  the datas which are linked
+
+4) what is the difference between RDBMS and DBMS 
+RDBMS is an type of DBMS,where data is stored as tables
+
+5)what is a database
+organized collection of related data which can be stored in a system
+
+6)what is the difference between sql and my sql
+my sql is anclient software,database management system which support RDBMS,SQL is a language used to access the language stored in RDBMS
+
+7)How many types of commandas are in SQL
+5 types
+	DDL
+	DML
+	DQL
+	TCL
+	DCL
+
+8) what type of command is CREATE
+DDL
+
+9) what type of command is DELETE
+DML
+
+10)what type of command is REVOKE
+TCL
+
+11)what is the length of char column
+255
+
+12)what is the length of varchar column
+65535
+
+13) inorder to change the strature of table which command can we use
+DDL
+
+14)what is the default form of storing date in year
+year-month-date
+
+15) which commands come under DCL
+GRAND and REVOKE
+
+16)Difference between DELETE and DROP 
+DROP will entirely remove the table, cannot be rolled back,DDL command
+DELETE will remove the datas,can be rolled back,DML command
+
+17)difference between CHAR and VARCHAR
+in CHAR the specified size will will alloted that is some memory is will be wasted
+in VARCHAR the memory will be alloted as per the input,DYNAMIC MEMEORY ALLOCTION
+
+18)keyword used to select the unique values in a column
+DISTINCT
+
+19) how to see the first 5 records in a table
+limit 5
+
+20)how will you find the customer name starting with letter s
+where customer_name like 's%'
+
+21)which clause is used to arrange the data in result
+order by
+
+22)what default mode of sorting using order by
+ascending
+
+23)what CASE statement used for
+to check for multiple condition
+
+24)how many arguments IFNULL takes
+TWO , example------------> ifnull(country,state)
+
+25)which command is use to return first non null values, and how many arguments we can pass in it
+coalesce, we can pass many arguments
+
+26)what is the output of the code
+select coalesce (null,a,b,null)
+output=a
+
+27)select coalesce(mango,orange,null)
+output=mango
+
+28)selct ifnull(null,500)
+output=500
+
+29)does count function include null values in a column
+no
+
+30)how will you replace unwanted character in a string
+select replace ('i love my sql','my sql','python');
+
+31)how to find the differnce bewteen two dates
+datediff
+
+32)difference between WHERE and HAVING CLAUSE
+where is used to filter records,having is used to select specific groups after doing a groupby
+where can be used without and within groupby 
+
+33) how will find the number of unique values in a column
+select count(distinct(emp_id) ) from myemp; 
+
+34)whcih constraint is used to enforece uniqueness in a column
+unique and primary key
+
+35)whcih constraint doesnot enforece uniqueness in a column
+foreign key
+
+36)whcih is a table level constraint
+primary key because a table can only have only one primary key
+
+37)what is the meaning of null
+empty
+
+38)_________ integrity is obtained by foreign key
+referential integrity
+
+38)on delete cascade?
+when we delete an item in the parent table ,then it is also going to delete the value in child table
+
+39)is it possible to have multiple foreign key 
+yes
+
+40)is it possible to add constraints to an existing table
+yes, alter table tablename modify column columnname
+
+41)if you write a select statement using join how many statements will be there in the result
+sum of columns of both tables
+
+42)how many tables can be join
+multiple tables can be joined
+
+43)what will be the output if  there are no common values found in the output of the select
+empty set
+
+44)how to add a new column to the existing table
+alter table tablename add column columnname dtype
+
+45)how to add a new column to the existing table at a specified position
+yes, alter table tablename add column columnname dtype after specified columnname
+
+46)which command is used to see the stucture of the table
+describe
+
+47)when we want to remove the data from the table without loosing the table structure
+delete/truncate
+
+48)is it possible to drop multiple columns at once
+yes alter table tablename drop column,c1,c2....
+
+49)what is the difference between drop and truncate is it possible to rollback after commit
+drop is going to entirely remove an table,truncate is going to remove the entirely remove the table and remove the
+
+50)what objects can we create using create command
+table,stored procedure,database,create view,trigger,index
+
+51)which commaand is used to add a row to the table
+insert
+
+52) is it possible to rollback after commit
+false
+
+53)is it possible to rollback a part of the transcation
+yes we can use savepoint
+
+54)what is transcation in mysql
+set of commands that work as a single unit
+
+55)what is the difference bewteen truncate and delete
+delete is an dml command
+we can use delete with where clause
+delete can be used to delete a perticluar part of the data
+
+truncate is an ddl command
+we cannot use truncate with where clause
+
+56)index help to speed up ___________
+fetch the data faster(select)
+
+57)can a view contain all raws of a table
+it can conatain all rows(a view can be a table)
+
+58)can we insert and delete rows using a view
+yes
+
+59)__________ index not allow duplicate values
+UNIQUE
+
+60) what is an index
+it is an database object used in atable ,for improving the performance of fetching the data
+
+61)will the data change on the table reflect in the view
+yes
+
+62)a procedure is removed using
+drop procedure
+
+63)____ parameter allow you to pass value into the stored procedure
+in parameter/inout parameter
+
+64)can we use DML commands in a stored procedure
+yes
+
+65)which of the following is the command delimiter used in stored procedure;
+we can set the delimiter 
+
+66)what is the default parameter in stored procedure
+IN
+
+67)command used to delete a procedure permanently
+DROP
+
+68) what is the purpose to create a stored procedure
+to write complex code,to write a code which is repeatative in nature
+
+69)what are the advantage of using stored procedure
+it reduce the network useage between client and server,improve the performance,security is improved,imporove the performances 
+
+70)which of the window function is used to refer the previous value
+LAG
+
+71)when we write over clause by mentioning the partion by specific column the function is performed over ? 
+it is performed on the group
+
+72)which clause is used to sort the values in the window function partioned by some column
+order by
+
+73)what are the similarity between group by and partion by
+both can be used to create agg functions
+
+74)what is the difference between rank and dense rank
+in rank if we have multiple value for a specific number then it is going to skip the next value 
+for example ther are two people with rank 1 then there will be no peoples with rank 2, the next rank will be 3
+
+the dense_rank will solve this issue 
+
+75)what is a subquerry
+qyerry within a querry
+
+76)correlated subquerry
+thse subquerry part cannot be executed alone,some value should be passed from the main querry
+
+77) types of handler for exception
+continue and exit
+
+78)in a cursor which of the following condition value is used
+not found
+
+79)in which loop the  search conditionn return at the begining
+while loop
+
+80)which of the statement is used to exit the loop
+leave
+
+81)how many error codes can be handle in a single exception handler
+one
+
+82)what is a cursor
+cursor is a special datatype which is only supported in sql,used in store procedure,it allow iterate through the records
+
+83)how can we specify a row level trigger
+for each row
+
+84)statement used to remove a trigger
+drop
+
+85)can we define variable in trigger body
+yes
+
+86)

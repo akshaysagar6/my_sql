@@ -1,0 +1,732 @@
+-------------> null <----------------
+represent anything
+we cannot perform any arithmatic or logic operation on it
+5+null=null
+5>null=null
+
+operator work on null isnull and is not null
+
+5 is null = false
+5 is not null= true
+
+we can have many null value in a column if the column is unique
+
+
+-------------> DDL <---------------
+DDL commandas are used to work on database objects such as table,view,index,stored procedure,function etc
+
+CREATE 
+		create table tablename (columnname dtype);
+
+ALTER 
+	add ------->used to add a column
+		alter table students add column std_id int;
+	modify-----> used to modify the column that is change the dtye add constraints etc
+			alter table students modify column sname varchar(40);
+	change------> used to change the column name
+			alter table students change column columnname sname varchar(30); 
+	drop-----> used to drop a column
+			alter table students drop column std_id ;
+	rename------> used to rename the table
+			alter table students rename students_table; 
+	
+
+DROP
+	used to drop a column
+	drop tablename;
+RENAME
+	used to rename a table
+	rename tablename to newtable name;
+TRUNCATE
+	truncate table tablename;
+
+-------------->DML<--------------
+INSERT
+	insert into tablename values();
+--> insert into specific column
+	insert into table (column names) values();
+
+UPDATE
+	update tablename set=    where ;
+-- update multiple columns 
+update student set mark=22, course='python' where stid=2;
+
+DELETE
+	delete from  tablename;
+-----> delete specfic value
+	delet from tablename where   ;
+
+
+-----------> constraints <------------
+
+----------> domain constraints
+
+-- unique,not null ,check,default
+create table student1 (id integer unique,student_name varchar(20) not null,age integer check(age>18),course varchar(20));
+desc student1;
+insert into student1 values(1,'james',23,'mysql'),(2,'john',23,'DA');
+select * from student1;
+-- default
+alter table student1 modify column course varchar(20) default('mysql');
+
+insert into student1 values(3,null,32,'mysql');-->Error Code: 1048. Column 'student_name' cannot be null
+that is my this insertion  methode the name cannot be null 
+
+insert into student1 (id,age,course) values(3,32,'mysql');-->Error Code: 1364. Field 'student_name' doesn't have a default value
+that is by this methode the error is because the default value is null and the student name cannot be null
+
+so we can use default=some value
+
+alter table student1 modify column student_name varchar(20) not null default 'kumar';
+this will solve the error that is when we didnt pass any values the kumar will take as a default value but when we use <----- insert into student1 values(3,null,32,'mysql') ----> gives an error because we are forcing a null value
+
+--------------> key constraints
+
+<------------primary key---------->
+
+The primary key can be used to 
+uniquely identify the rows of a table. Only one primary key is allowed per table.
+
+
+
+Foreign Keys constraints ensure data integrity, by enforcing that values in one table must match 
+values in another table.
+
+create parent key first
+create table author(author_id integer primary key ,author_name varchar(20));
+
+then child 
+create table books_author(book_id integer primary key,book_title varchar(20),author_id integer,foreign key(author_id) references author(author_id)  on delete cascade on update cascade);
+
+ update author set author_name = 'Oscar Wild' where author_id=3;
+
+delete from author where author_id=1;
+the book_with author id =1 will also be deleted
+
+-- changes making in author(parent) we also appear in the books(child)
+
+<-----------Sequence Object----------->
+
+used to generate sequence of numbers
+Auto Generate is used to create an sequence object,can only used with Primary key
+
+create table test(id int primary key auto_increment,name varchar(30));
+alter table test auto_increment=100;
+insert into test(name) values('john'),('ram'),('merry'),('bean');
+select * from test;
+
+
+<-----------View----------->
+
+a select that has given a name 
+
+select emp_id,first_name,salary,salary *0.2 as bonus from myemp; ----------> instead of this we can use
+create view myview as select emp_id,first_name,salary,salary *0.2 as bonus from myemp; --------> now the select is stored on myview ,select * from myview can be used to display the output
+
+create view myview2 as select * from author where author_id<20;
+--------->inserting on view will also insert on author
+
+---------> we set view with author id less than 20 but we are inserting 22 
+insert into myview2 values(22,'harry');
+---------> thsi 22 will not be in the view but it will be present in the author
+
+this is an issue basically views are used to create restrications ,here when updating on views the updation is also taking place in the paraent of the view ,it cannot happen for this ''with check option'' is used
+
+check option (check option prevent the updation happening in views reflects the parent) 
+create view myview4 as select * from author where author_id < 22 with check option;
+
+insert into myview4 values(25,'watson'); now this will give an error and no values will be inserted to the view and the parent because the author id is greater than 20
+
+
+---------> rollback,commit<------------
+set autocommit= 0; to turn off auto commit
+insert into author value(11,'luther');
+select * from author;
+rollback;
+
+-- as the data is in buffer we use rollback so it will undo
+
+select * from author;
+insert into author value(11,'luther');
+commit;
+select * from author;
+rollback;
+
+-- as we said commit the data is passed from buffer to persistant memory so rollback cannot be done
+
+start transaction; --------> this set auto_commit to 0
+insert into newt values('c'),('d');
+select * from newt;
+rollback;
+-- after rollback the c,d is removed and set auto commit=1
+
+start transaction;
+insert into newt values('c'),('d');
+select * from newt;
+savepoint cd;
+insert into newt values('e'),('f');
+select * from newt;
+savepoint ef;
+insert into newt values('g'),('h');
+rollback to ef; --------->abcdef will show delete gh 
+select * from newt;
+rollback to cd;---------->abcd will show delete ef
+select * from newt;
+
+commit------> now we are out of the transaction 
+
+
+------------->Stored Procedure<-------------
+
+similar to functions,no need to be return a value,but function need to return a value,stored procedure will add some functionality to the query
+
+-----> parameters in stored procedure 
+                       1) IN ----- used to take the value from outside  to inside of the procedure (IN variablename varaiable type)
+                       2) OUT ------ used to take the value to ouside of the procedure from inside (OUT variablename varaiable type)
+			
+CREATE DEFINER=`root`@`localhost` PROCEDURE `out_proc`(IN x int,out y int)
+BEGIN
+	set y= x+2;
+END
+
+			3) INOUT ------ used to in and out the value
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `IN_OUT_PROC`(INOUT sal int)
+BEGIN
+	declare bon float(2,1);
+    if sal >10000 then
+		set bon = 0.2;
+    elseif sal>5000 then
+		set bon=0.1;
+	else 
+		set bon=0;
+	end if;
+    set sal= sal + sal * bon;
+END
+
+			
+CREATE DEFINER=`root`@`localhost` PROCEDURE `my_proce`(bid integer)--------> here we can pass the book id 
+BEGIN
+	select * from books where bookid=bid;------------->  now its going to fetch all the details of the bookid we have given
+END
+
+---------->local variable<-------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `my_proce2`(eid int)
+BEGIN
+	-- local variable use to store the salary
+	declare sal integer;
+    -- storing the salary into the local variable
+	select salary into sal  from myemp where emp_id=eid;
+    if sal > 10000 then
+		update myemp set commission_pct = 2 where emp_id=eid;
+    end if;
+END
+
+local variable is used because while using select we cannt take the value(salary) outside the select ,it can only used within the select ,so to store that value from select we use local variables
+------->local variable can be only used within the procedure (between begin and end)
+
+
+
+-------------------->simple loop<------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `simple_loop`(ctr int)
+BEGIN
+declare counter int default 0;
+
+myloop:loop
+	select 'hello' as greetings;
+    set counter = counter +1;
+    
+    if counter = ctr then
+		leave myloop;
+    end if;
+end loop myloop;
+select 'completed' as msg;    
+END
+
+
+-------------------->Repeat loop<------------------
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `repeat_loop`(ctr int)
+BEGIN
+declare counter int default 0;
+
+	myloop:Repeat
+		select 'welcome' as greeting;
+		set counter=counter +1;
+    until counter=ctr
+	end repeat myloop;
+    
+END
+
+------------------>while loop<-------------------
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `while_loop`(num int)
+BEGIN
+	declare counter int default 0;
+    myloop:while counter < num do
+		select 'morning' as greeting ;
+		set counter = counter +1;
+	end while myloop;
+select 'completed' as meaasge;
+END
+
+
+----------------->exception handler<---------------
+
+CREATE PROCEDURE `except1` ()
+BEGIN
+	declare continue handler for 1146
+	begin 
+		select 'check your table name' as message; 
+	end;
+
+	-- procedure starts here
+    select 'procedure starts here' as message;
+    select * from xyz; ----------->this is an error there is no table xyz , here the sql check for the code for exception ,as we mentioned continue in decalre so the next line of code will be executed(select 'procedure completed ' as message;)
+    select 'procedure completed ' as message;
+END
+
+output----->
++-----------------------+
+| message               |
++-----------------------+
+| check your table name |
++-----------------------+
+1 row in set (0.01 sec)
+
++----------------------+
+| message              |
++----------------------+
+| procedure completed  |
++----------------------+
+
+
+<--------------------Multi Exception------------------->
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `except2`(num int) ---------------------> here num is the " IN PARAMETER " used to pass the value from outside to inside of the procedure 
+BEGIN
+	declare exit handler for 1146
+	begin 
+		select 'table not found' as message;
+	end;
+
+	declare exit handler for 1054
+	begin
+		select 'enter proper column name';
+	end;
+    
+    
+	select 'before exception' as message; 
+	if num=1 then
+		select * from xyz;
+	else
+		select address from student;
+	end if;	
+
+	select 'after exception' as message;
+
+
+
+END
+
+if we enter 1 then it select * from xyz; as there is no table named xyz it is an 1146 exception,so code for this exception will run
+if we enter numbers rather than 1, then it select address from student ; as there is no address column in the table  it is an 1054 exception,so code for this exception will run
+
+-----------------> applying exception handler <--------------------
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `payment1`(clientid integer,amt integer)
+BEGIN
+	-- handler
+	declare continue handler for 1048
+	begin
+	insert into fraud values(1,clientid,'payment unsuccessful',now());
+	end;
+    
+	-- procedure 
+	select 'Start Payment' as message;
+	insert into payments values(clientid,amt);
+	select 'Process completed' as message;
+
+END
+
+here the handler will collect the clientid to a table named fraud when the amount is null 
+
+call practicedb.payment1(4,null);------------>client id stored into fraud table
+
+ select * from fraud;
++----+-----------+----------------------+---------------------+
+| id | client_id | message              | tot                 |
++----+-----------+----------------------+---------------------+
+|  1 |         4 | payment unsuccessful | 2024-03-25 10:36:30 |
++----+-----------+----------------------+---------------------+
+
+
+call practicedb.payment1(5,8000);------------>client id  and amount stored into payments table
++-----------+--------+
+| client_id | amount |
++-----------+--------+
+|         1 |   1000 |
+|         2 |   1000 |
+|         3 |   4000 |
+|         5 |   8000 |
++-----------+--------+
+
+
+<------------ Curs0r ------------>
+
+declare completed int default 0;
+declare name cursor for ---------
+
+declare continue handler for not found
+    begin
+    set completed =1;
+    end;
+
+open mycursor;
+		myloop:loop
+			fetch mycursor into pcod,ven,stock;
+			if completed=1 then 
+				leave  myloop;
+			end if;
+                           statements;
+
+                 end loop myloop;
+close mycursor;
+
+
+
+<---------------------STORED PROCEDURE    VS    FUNCTION---------------------->
+
+STORED PROCEDURE 
+
+ 	1.not need to return an value
+	2. can be long and complex(can contain cursors,loops,ctrl statements etc)
+	3 call by using call procedure name();
+
+FUNCTION
+	1.need to return a value
+	2.should be short and not complex
+	3. it is not called ,used as a part another commands
+	4. functions are of two types 
+		1 user defined
+		2 build in 
+			--date,string,numeric
+			select hire_date,month(hire_date),day(hire_date),monthname(hire_date),year(hire_date) from myemp;
+			--- add date,month,year,minutes,seconds
+				select date_add('2008-01-02', interval 31 day); 
+				select date_add('2008-01-02', interval 2 month);
+				select date_add('2008-01-02', interval 2 year);
+				select date_add('2008-01-02 10:30:30', interval 2 minute);
+			--- subtract date,month,year,minutes,seconds
+				select date_sub(--------------------)
+			
+			--- applying on a column
+			select toa ,date_add(toa,interval 20 day)  as date_discharge from patient;
+
+			--- time_diff
+			select  timediff('10:30:30','11:30:30');
+
+-- date format
+/*
+%a -- 3letter abbrivation of day (mon,tue, etc)
+%A -- gives day (monday,tuesday etc)
+%b -- gives month as (jun,mar etc)
+%c -- gives month as number (1,2,3,4)
+%d -- day of month
+%D -- weekday as a number
+%y -- year last 2 number (21,22,23)
+%Y -- year full(2024,2023)
+*/
+select hire_date,date_format(hire_date,'%d-%c-%Y')as formatted_date from myemp ;
++------------+----------------+
+| hire_date  | formatted_date |
++------------+----------------+
+| 1998-06-17 | 17-6-1998      |
+| 1987-06-18 | 18-6-1987      |
+| 1987-06-19 | 19-6-1987      |
+| 1976-06-20 | 20-6-1976      |
+| 1987-06-21 | 21-6-1987      |
++------------+----------------+
+
+select hire_date,date_format(hire_date,'%d %a %b %Y')as formatted_date from myemp ;
++------------+-----------------+
+| hire_date  | formatted_date  |
++------------+-----------------+
+| 1998-06-17 | 17 Wed Jun 1998 |
+| 1987-06-18 | 18 Thu Jun 1987 |
+| 1987-06-19 | 19 Fri Jun 1987 |
+| 1976-06-20 | 20 Sun Jun 1976 |
+| 1987-06-21 | 21 Sun Jun 1987 |
+| 1987-06-22 | 22 Mon Jun 1987 |
+| 1980-06-23 | 23 Mon Jun 1980 |
++---------------+----------------+
+
+-- time format
+
+select pid,pname,toa,time_format(toa,'%h:%i:%p') as adm_time from patient;
++------+-------+---------------------+----------+
+| pid  | pname | toa                 | adm_time |
++------+-------+---------------------+----------+
+|    1 | tom   | 2024-04-03 15:48:00 | 03:48:PM |
+|    2 | john  | 2024-03-18 08:45:33 | 08:45:AM |
++------+-------+---------------------+----------+
+
+----------->  string functions
+-- concat
+
+select emp_id,concat(first_name,' ',last_name) as ename,email,hire_date,job_id,salary,commission_pct from myemp; 
++--------+-------------------+----------+------------+------------+----------+----------------+
+| emp_id | ename             | email    | hire_date  | job_id     | salary   | commission_pct |
++--------+-------------------+----------+------------+------------+----------+----------------+
+|    100 | Steven King       | SKING    | 1998-06-17 | AD_PRES    | 24000.00 |           0.20 |
+|    101 | Neena Kochhar     | NKOCHHAR | 1987-06-18 | AD_VP      | 17000.00 |           0.00 |
+|    102 | Lex De Haan       | LDEHAAN  | 1987-06-19 | AD_VP      | 17000.00 |           0.20 |
+|    103 | Alexander Hunold  | AHUNOLD  | 1976-06-20 | IT_PROG    |  9000.00 |           0.10 |
+|    104 | Bruce Ernst       | BERNST   | 1987-06-21 | IT_PROG    |  6000.00 |           0.00 |
+|    105 | David Austin      | DAUSTIN  | 1987-06-22 | IT_PROG    |  4800.00 |           0.00 |
+|    106 | Valli Pataballa   | VPATABAL | 1980-06-23 | IT_PROG    |  4800.00 |           0.00 |
++--------+-------------------+----------+------------+------------+----------+----------------+
+
+select emp_id,concat_ws('-',first_name,last_name) as ename,email,hire_date,job_id,salary,commission_pct from myemp; 
++--------+-------------------+----------+------------+------------+----------+----------------+
+| emp_id | ename             | email    | hire_date  | job_id     | salary   | commission_pct |
++--------+-------------------+----------+------------+------------+----------+----------------+
+|    100 | Steven-King       | SKING    | 1998-06-17 | AD_PRES    | 24000.00 |           0.20 |
+|    101 | Neena-Kochhar     | NKOCHHAR | 1987-06-18 | AD_VP      | 17000.00 |           0.00 |
+|    102 | Lex-De Haan       | LDEHAAN  | 1987-06-19 | AD_VP      | 17000.00 |           0.20 |
+|    103 | Alexander-Hunold  | AHUNOLD  | 1976-06-20 | IT_PROG    |  9000.00 |           0.10 |
+|    104 | Bruce-Ernst       | BERNST   | 1987-06-21 | IT_PROG    |  6000.00 |           0.00 |
+|    105 | David-Austin      | DAUSTIN  | 1987-06-22 | IT_PROG    |  4800.00 |           0.00 |
+|    106 | Valli-Pataballa   | VPATABAL | 1980-06-23 | IT_PROG    |  4800.00 |           0.00 |
+|    107 | Diana-Lorentz     | DLORENTZ | 1987-06-24 | IT_PROG    |  4200.00 |           0.00 |
++--------+-------------------+----------+------------+------------+----------+----------------+
+
+-- instr
+select instr('zero one two three','three'); ---------------> 14
+-- instr
+select instr('zero one two three','five');-----------------> 0 because no five present in it
+
+-- replace
+select replace ('i love my sql','my sql','python'); it will replace my sql with python
+-------------> i love python
+
+select reverse('python');
+select upper('python');
+select lower('python');
+select trim('   python   ');
+select ltrim('   python');
+select rtrim('python   ');
+select length(' it will replace my sql with python')
+select first_name,left(first_name,1) from myemp;-------------> takes the 1 letter from left,
+						left(word,number of letters to be taken)
+
+-- names stating with vowels
+select first_name,left(first_name,1)  from myemp where  left(first_name,1) in ('a','e','i','o','u') ;
+-- names ending with vowels
+select last_name ,right(last_name,1) from myemp where right(last_name,1) in ('a','e','i','o','u');
+
+
+<------------------ TRIGGER---------------->
+
+triggers can be used in DML commands (update,insert,delete)
+
+1.after trigger
+2.before trigger
+
+------------> writing trigger for table books,here we create a table book_sales to get the sales of the books
+
+CREATE DEFINER=`root`@`localhost` TRIGGER `books_AFTER_UPDATE` AFTER UPDATE ON `books` FOR EACH ROW BEGIN
+	insert into book_sales(bookid,title,qty_sold,tos) values(old.bookid,old.title,new.sales-old.sales,now());
+END
+
+here we add a column sales when we update the number of sales the sales are recorded  in book_sales table ,
+
+alter table books add column sales int default 0;
+update books set sales = sales +2 where bookid=5;
+update books set sales = sales +5 where bookid=6;
+select * from books;
+
++--------+-----------------------+----------+-------+
+| BookId | Title                 | AuthorId | sales |
++--------+-----------------------+----------+-------+
+|      5 | Night Without End     |        5 |     2 |
+|      6 | Fear is the Key       |        5 |     5 |
+|      7 | Where Eagles Dare     |        5 |     0 |
+|      8 | Sense and Sensibility |        6 |     0 |
+|      9 | Pride and Prejudice   |        6 |     0 |
+|     11 | Five Point Someone    |        7 |     0 |
+|     12 | Two States            |        7 |     0 |
+|     13 | Salome                |        8 |     0 |
+|     14 | The Happy Prince      |        8 |     0 |
++--------+-----------------------+----------+-------+
+
+select * from book_sales
+
++---------+--------+-------------------+----------+---------------------+
+| sale_id | bookid | title             | qty_sold | tos                 |
++---------+--------+-------------------+----------+---------------------+
+|       6 |      5 | Night Without End |        2 | 2024-03-26 19:12:51 |
+|       7 |      6 | Fear is the Key   |        5 | 2024-03-26 19:14:13 |
++---------+--------+-------------------+----------+---------------------+
+
+-- index
+
+show indexes from author; -----------> this will show the index in the table author
+
+-- syntax
+create [unique| spatial| full text] index  index_name [using hash|btree] on tablename(columnname);
+-example
+create index hidx on employee(hire_date);--------> this is an non unique btree index
+btree is default value 
+
+
+------------------------> window function <----------------------
+
+groupby only support the columns used in the groupby and aggeraate function
+select dep_id,avg(salary) from myemp group by dep_id;
+
+but window function support as many columns as we want and the agg functions
+
+--syntax
+
+select column_names,agg(column_names) over (partition column_name orderby column_name) from tablename;
+
+-- example
+select first_name,last_name,salary,dep_id,avg(salary) over (partition by dep_id order by dep_id ) as avg_salary from myemp;
+
++-------------+-------------+----------+--------+---------------------+
+| first_name  | last_name   | salary   | dep_id | avg_salary   |
++-------------+-------------+----------+--------+--------------+
+| Jennifer    | Whalen      |  4400.00 |     10 |  4400.000000 |
+| Michael     | Hartstein   | 13000.00 |     20 |  9500.000000 |
+| Pat         | Fay         |  6000.00 |     20 |  9500.000000 |
+| Den         | Raphaely    | 11000.00 |     30 |  4150.000000 |
+| Alexander   | Khoo        |  3100.00 |     30 |  4150.000000 |
+| Shelli      | Baida       |  2900.00 |     30 |  4150.000000 |
+| Sigal       | Tobias      |  2800.00 |     30 |  4150.000000 |
+| Guy         | Himuro      |  2600.00 |     30 |  4150.000000 |
++-------------+-------------+----------+--------+--------------------+
+
+----------------------> CTE (common table epression) <----------------------
+select * from (select first_name,salary,salary*0.2 as bonus from myemp) as emp where bonus>1000;
+or
+with cte as (select first_name,salary,salary*0.2 as bonus from myemp) select * from cte where bonus >2500;
+
+
+-------> window function does not support where clause for that we use a cte
+
+-- employe where salary greater than avg_salary 
+select * from(select first_name,last_name,salary,dep_id,avg(salary) over (partition by dep_id ) as avg_salary from myemp) as emp where salary > avg_salary;
+
+-- employee who are getting the max salary in each department
+select dep_id,max(salary) from myemp group by dep_id order by dep_id;
+select * from (select first_name,last_name,dep_id,salary,max(salary) over (partition by dep_id) as max_salary from myemp) as emp where salary=max_salary;
+
+-- find the film that is getting the maximum number of oscars in each genre
+use excelrdb;
+select * from film;
+select title,genreid,oscarnominations,max(oscarnominations) over (partition by genreid) as genre from film;
+select * from (select filmid,title,genreid,oscarnominations,max(oscarnominations) over (partition by genreid) as genre from film) as oscar where oscarnominations=genre;
+
+----------------->functions that are available in windows function
+			1.lag
+			2. lead
+			3. rank
+			4. dense_rank
+			5. row_number
+			6. all agg function(count,sum,min,max,std)
+
+--dense_ rank
+select *,dense_rank() over (order by mark desc) as rnk from marks;
+
+ -- employee with 2nd most salary
+select * from myemp;
+select emp_id,concat(first_name,' ',last_name) as name,salary,dense_rank() over(order by salary desc) as rnk from myemp;
+select * from(select emp_id,first_name,last_name,dense_rank() over(order by salary desc) as rnk from myemp)as rnk where rnk=2;
+
+-- lag,lead
+select *,subtime(next_satation , time) as jrny_time from (select *,lead(time) over (partition by train_id order by time) as next_satation from trains) as tim;
+
+-- students presnt for 3 consicutive days
+select *,lead(attendance,1) over(partition by student_id order by date_id) as day2,lead(attendance,2) over(partition by student_id order by date_id) as day3 from students_d;
+select distinct(student_id) from(select *,lead(attendance,1) over(partition by student_id order by date_id) as day2,lead(attendance,2) over(partition by student_id order by date_id) as day3 from students_d) as attend where attendance='p' and day2='p' and day3='p';
+
+-- rank vs dens_rank vs row number
+select *,rank() over (order by mark) as rnk ,dense_rank() over (order by mark) as dense_rnk,row_number() over (order by mark) as row_num from marks; 
+
+---------------->enum<----------------------
+when we use enum ,the values written inside the the enum can only be inserted into that column
+
+create table stud(id integer primary key,mark integer,garde enum('a','b','c','d'));
+insert into stud values(1,86,'a'),(2,56,'c');
+
+here for grade column we can only insert values a,b,c and d
+
+-----------------> if inside select<-----------------
+
+-- if salary is greater thean 10000 then excellent else good
+select emp_id,first_name,last_name,salary ,if(salary >10000,'Excellent','good') as status from myemp;
+
+
+-- movie_type based on the runtime
+select filmid,title,runtimeminutes, if(runtimeminutes > 100,'Long','short') as movie_type from film;
+
+-- other methode
+select filmid,title,runtimeminutes, if(runtimeminutes > 200,'long',if(runtimeminutes > 150,'regular','short')) as movie_type from film;
+
+-- other methode
+select filmid,title,runtimeminutes,
+case
+when runtimeminutes >=200 then 'long film'
+when runtimeminutes >=100 then 'regular film'
+else 'short film'
+end as film_type from film;
+
+
+-- salary * 1.25 if the employee is full time and job rating is 1,2,3
+select * from employees;
+select first,last,status,salary,jobrating,if(status='full time' and jobrating in (1,2,3) , salary*1.25,salary) as new_salary from employees; 
+
+
+-- salary *2.5 if status=full time and job rating =1,2,3, status=contract then salary*1.5, status=halftime then salary =1.1
+ select * from employees;
+ select first,last,salary,jobrating,if(status='full time' and jobrating in (1,2,3),salary*2.5,if(status='contract' and jobrating = 1,salary*1.5,if(status='halftime',salary*1.1,salary ))) as new_sal from employees;
+ 
+ -- using case
+ select first,last,salary,jobrating,
+ case 
+ when status='full time' and jobrating in (1,2,3) then salary*2.5
+ when status='contract' and jobrating = 1 then salary*1.5
+ when status='halftime' then salary=1.1
+ else salary
+ end as newsal from employees;
+
+-- case another
+UPDATE employee
+SET salary = CASE 
+                WHEN rating = 1 THEN salary * 1.2
+                WHEN rating = 2 THEN salary * 1.05
+                ELSE salary  -- No change for other ratings
+             END
+WHERE rating IN (1, 2);
+
+--------------> ifnull <------------------
+
+select *,ifnull(state,'NA') as statename from offices;
+here if state have a value that that value is taken else it will take 'NA'
+
+ select *,ifnull(state,country) as ststename from offices;
+here it will replace the null values with country column 
+
+ --------------> coalesce <----------------
+
+extreme version of ifnull, here (state,country) when state is null then select value from country, what if country is also null then
+(state,country,region) here the first null value will be taken 
+
+ select city,addressline2,state,country, coalesce(addressline2,state,country) as newname from offices;
+
+-------------> having clause <------------------
+used to select  groups,while where clause is used to select rows
+
+select dep_id,avg(salary) from myemp group by dep_id having dep_id in (60,70,100);
+
